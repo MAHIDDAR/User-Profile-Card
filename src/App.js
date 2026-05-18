@@ -3,113 +3,62 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 import ProfileCard from './components/ProfileCard';
+import UserDetailsCard from './components/UserDetailsCard';
 import UserSelector from './components/UserSelector';
 
-import { fetchUserData } from './services/api';
-
-import user1 from './assets/user1.jpg';
-import user2 from './assets/user2.jpg';
-import user3 from './assets/user3.jpg';
-import user4 from './assets/user4.jpg';
-import user5 from './assets/user5.jpg';
+import { fetchUsers } from './services/api';
 
 function App() {
 
-  const [userData, setUserData] = useState(null);
+  const [users, setUsers] = useState([]);
+
+  const [selectedUser, setSelectedUser] = useState(1);
 
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState('');
 
-  const [selectedUser, setSelectedUser] = useState(1);
-
-
-  const extraUserDetails = {
-
-    1: {
-      name: 'Mahiddar Reddy',
-      image: user1,
-      role: 'Associate Software Engineer',
-      bio: 'Focused on improving coding skills and building practical projects.'
-    },
-
-    2: {
-      name: 'Rahul Kumar',
-      image: user2,
-      role: 'UI/UX Designer',
-      bio: 'Passionate about creating modern and user-friendly designs.'
-    },
-
-    3: {
-      name: 'Rupesh',
-      image: user3,
-      role: 'Backend Developer',
-      bio: 'Enjoy working with APIs and database integration.'
-    },
-
-    4: {
-      name: 'Charan',
-      image: user4,
-      role: 'Full Stack Developer',
-      bio: 'Learning both frontend and backend technologies step by step.'
-    },
-
-    5: {
-      name: 'Muzamil',
-      image: user5,
-      role: 'Frontend Developer',
-      bio: 'Interested in building responsive web applications using React.'
-    }
-
-  };
-
-
-
   useEffect(() => {
 
-    const getUser = async () => {
+    const loadUsers = async () => {
 
       try {
 
         setLoading(true);
 
-        setError('');
+        const data = await fetchUsers();
 
-        const data = await fetchUserData(selectedUser);
-
-        setUserData(data);
+        setUsers(data);
 
       } catch (err) {
 
-        setError('Unable to fetch user details.');
+        setError('Unable to fetch user data.');
 
       } finally {
 
         setLoading(false);
       }
-
     };
 
-    getUser();
+    loadUsers();
 
-  }, [selectedUser]);
+  }, []);
+
+  const currentUser = users.find(
+    (user) => user.id === selectedUser
+  );
 
   return (
 
     <div className="app">
 
       <h1 className="main-heading">
-        Dynamic User Profile Card
+        Dynamic User Profile Dashboard
       </h1>
-
-      <UserSelector
-        selectedUser={selectedUser}
-        onSelectUser={setSelectedUser}
-      />
 
       {loading && (
         <h2 className="message">
-          Loading user data...
+          Loading users...
         </h2>
       )}
 
@@ -119,25 +68,25 @@ function App() {
         </h2>
       )}
 
-      {userData && !loading && (
+      {!loading && users.length > 0 && (
 
-        <ProfileCard
+        <>
 
-          image={extraUserDetails[selectedUser].image}
+          <UserSelector
+            users={users}
+            selectedUser={selectedUser}
+            onSelectUser={setSelectedUser}
+          />
 
-          name={extraUserDetails[selectedUser].name}
+          <div className="cards-container">
 
-          role={extraUserDetails[selectedUser].role}
+            <ProfileCard user={currentUser} />
 
-          bio={extraUserDetails[selectedUser].bio}
+            <UserDetailsCard user={currentUser} />
 
-          email={userData.email}
+          </div>
 
-          company={userData.company.name}
-
-          website={userData.website}
-
-        />
+        </>
 
       )}
 

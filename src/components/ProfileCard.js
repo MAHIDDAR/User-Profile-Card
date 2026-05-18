@@ -2,52 +2,41 @@ import { useState } from 'react';
 
 import './ProfileCard.css';
 
-function ProfileCard(props) {
+function ProfileCard({ user }) {
 
-  const [following, setFollowing] = useState(false);
-
-  // follow button toggle
+  const [followedUsers, setFollowedUsers] = useState({});
 
   const handleFollow = () => {
 
-    setFollowing(!following);
-  };
+  setFollowedUsers((prev) => ({
 
+    ...prev,
+
+    [user.id]: !prev[user.id]
+
+  }));
+};
   return (
 
-    <div className="card">
+    <div className="profile-card">
 
       <img
-        src={props.image}
-        alt={props.name}
+        src={`https://i.pravatar.cc/150?img=${user.id}`}
+        alt={user.name}
         className="profile-image"
       />
 
-      <h2>{props.name}</h2>
+      <h2>{user.name}</h2>
 
-      <h4>{props.role}</h4>
+      <h4>@{user.username}</h4>
 
-      <p>{props.bio}</p>
-
-      <div className="user-details">
-
-        <p>
-          <strong>Email :</strong> {props.email}
-        </p>
-
-        <p>
-          <strong>Company :</strong> {props.company}
-        </p>
-
-        <p>
-          <strong>Website :</strong> {props.website}
-        </p>
-
-      </div>
+      <p className="short-bio">
+        Passionate about frontend development and learning modern web technologies.
+      </p>
 
       <button onClick={handleFollow}>
 
-        {following ? 'Following' : 'Follow'}
+        {followedUsers[user.id] ? 'Following' : 'Follow'}
 
       </button>
 

@@ -1,22 +1,25 @@
 import './UserSelector.css';
 
-function UserSelector({ selectedUser, onSelectUser }) {
+function UserSelector({ users, selectedUser, onSelectUser }) {
 
   return (
-    <div className="user-selector">
 
-      <label>Select User : </label>
+    <div className="selector-container">
 
       <select
         value={selectedUser}
-        onChange={(e) => onSelectUser(e.target.value)}
+        onChange={(e) => onSelectUser(Number(e.target.value))}
       >
 
-        <option value="1">User 1</option>
-        <option value="2">User 2</option>
-        <option value="3">User 3</option>
-        <option value="4">User 4</option>
-        <option value="5">User 5</option>
+        {users.map((user) => (
+
+          <option key={user.id} value={user.id}>
+
+            {user.name}
+
+          </option>
+
+        ))}
 
       </select>
 

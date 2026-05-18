@@ -1,20 +1,11 @@
-.user-selector {
-margin-bottom: 25px;
-text-align: center;
+.selector-container {
+  margin-bottom: 30px;
+  text-align: center;
 }
 
-.user-selector label {
-color: white;
-margin-right: 10px;
-font-size: 16px;
+.selector-container select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
 }
-
-.user-selector select {
-padding: 10px 15px;
-border-radius: 8px;
-border: none;
-font-size: 15px;
-outline: none;
-}
-
-
