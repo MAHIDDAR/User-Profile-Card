@@ -6,17 +6,26 @@ body {
 }
 
 .app {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 20px;
 }
 
 .main-heading {
-  margin-bottom: 35px;
   color: white;
-  font-size: 42px;
+  margin-bottom: 30px;
   text-align: center;
+  font-size: 38px;
+}
+
+.message {
+  color: white;
+  margin-top: 20px;
+}
+
+.error {
+  color: #fecaca;
 }

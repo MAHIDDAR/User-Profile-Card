@@ -1,34 +1,54 @@
 import { useState } from 'react';
+
 import './ProfileCard.css';
 
 function ProfileCard(props) {
 
-  const [follow, setFollow] = useState(false);
+  const [following, setFollowing] = useState(false);
+
+  // follow button toggle
 
   const handleFollow = () => {
-    setFollow(!follow);
-  }
+
+    setFollowing(!following);
+  };
 
   return (
-    <div className='card'>
+
+    <div className="card">
 
       <img
         src={props.image}
-        alt='profile'
-        className='profile-image'
+        alt={props.name}
+        className="profile-image"
       />
 
       <h2>{props.name}</h2>
 
       <h4>{props.role}</h4>
- 
-      
+
       <p>{props.bio}</p>
 
-      <h5>{props.location}</h5>
-      
+      <div className="user-details">
+
+        <p>
+          <strong>Email :</strong> {props.email}
+        </p>
+
+        <p>
+          <strong>Company :</strong> {props.company}
+        </p>
+
+        <p>
+          <strong>Website :</strong> {props.website}
+        </p>
+
+      </div>
+
       <button onClick={handleFollow}>
-        {follow ? 'Following' : 'Follow'}
+
+        {following ? 'Following' : 'Follow'}
+
       </button>
 
     </div>
