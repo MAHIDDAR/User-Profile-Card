@@ -1,14 +1,45 @@
-export const fetchUsers = async () => {
+const API_URL = "http://127.0.0.1:5000/users";
 
-  const response = await fetch(
-    'https://jsonplaceholder.typicode.com/users'
-  );
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch users');
-  }
+export const getUsers = async () => {
 
-  const data = await response.json();
+  const response = await fetch(API_URL);
 
-  return data;
+  return response.json();
+};
+
+
+export const addUser = async (userData) => {
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  return response.json();
+};
+
+
+export const updateUser = async (id, userData) => {
+
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  return response.json();
+};
+
+
+export const deleteUser = async (id) => {
+
+  await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
 };

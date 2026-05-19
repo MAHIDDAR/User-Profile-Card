@@ -1,0 +1,21 @@
+import React from "react";
+import "./SearchBar.css";
+
+const SearchBar = ({ searchTerm, setSearchTerm }) => {
+
+  return (
+
+    <div className="search-container">
+
+      <input
+        type="text"
+        placeholder="Search users..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+    </div>
+  );
+};
+
+export default SearchBar;

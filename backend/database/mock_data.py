@@ -4,7 +4,7 @@ users = [
         "id": 1,
         "name": "Mahiddar Reddy",
         "email": "mahiddar@gmail.com",
-        "role": "Frontend Developer",
+        "role": "Associate Software Engineer",
         "bio": "Interested in building responsive and user-friendly web applications.",
         "company": "Stackly",
         "website": "www.mahiddar.dev"

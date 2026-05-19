@@ -1,94 +1,130 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import './App.css';
+import "./App.css";
 
-import ProfileCard from './components/ProfileCard';
-import UserDetailsCard from './components/UserDetailsCard';
-import UserSelector from './components/UserSelector';
+import UserDashboard from "./components/UserDashboard";
+import UserForm from "./components/UserForm";
+import SearchBar from "./components/SearchBar";
 
-import { fetchUsers } from './services/api';
+import {
+  getUsers,
+  addUser,
+  updateUser,
+  deleteUser
+} from "./services/api";
+
 
 function App() {
 
   const [users, setUsers] = useState([]);
 
-  const [selectedUser, setSelectedUser] = useState(1);
-
   const [loading, setLoading] = useState(true);
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [editingUser, setEditingUser] = useState(null);
+
 
   useEffect(() => {
 
-    const loadUsers = async () => {
-
-      try {
-
-        setLoading(true);
-
-        const data = await fetchUsers();
-
-        setUsers(data);
-
-      } catch (err) {
-
-        setError('Unable to fetch user data.');
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
-
-    loadUsers();
+    fetchUsers();
 
   }, []);
 
-  const currentUser = users.find(
-    (user) => user.id === selectedUser
+
+  const fetchUsers = async () => {
+
+    try {
+
+      const data = await getUsers();
+
+      setUsers(data);
+
+      setLoading(false);
+
+    } catch (error) {
+
+      setError("Failed to fetch users");
+
+      setLoading(false);
+    }
+  };
+
+
+  const handleAddUser = async (userData) => {
+
+    if (editingUser) {
+
+      await updateUser(editingUser.id, userData);
+
+      setEditingUser(null);
+
+    } else {
+
+      await addUser(userData);
+    }
+
+    fetchUsers();
+  };
+
+
+  const handleDelete = async (id) => {
+
+    await deleteUser(id);
+
+    fetchUsers();
+  };
+
+
+  const handleEdit = (user) => {
+
+    setEditingUser(user);
+  };
+
+
+  const filteredUsers = users.filter((user) =>
+
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+
+    user.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+
+  if (loading) {
+
+    return <h2>Loading users...</h2>;
+  }
+
+
+  if (error) {
+
+    return <h2>{error}</h2>;
+  }
+
 
   return (
 
     <div className="app">
 
-      <h1 className="main-heading">
-        Dynamic User Profile Dashboard
-      </h1>
+      <h1>User Management Dashboard</h1>
 
-      {loading && (
-        <h2 className="message">
-          Loading users...
-        </h2>
-      )}
+      <SearchBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
 
-      {error && (
-        <h2 className="message error">
-          {error}
-        </h2>
-      )}
+      <UserForm
+        onSubmit={handleAddUser}
+        editingUser={editingUser}
+      />
 
-      {!loading && users.length > 0 && (
-
-        <>
-
-          <UserSelector
-            users={users}
-            selectedUser={selectedUser}
-            onSelectUser={setSelectedUser}
-          />
-
-          <div className="cards-container">
-
-            <ProfileCard user={currentUser} />
-
-            <UserDetailsCard user={currentUser} />
-
-          </div>
-
-        </>
-
-      )}
+      <UserDashboard
+        users={filteredUsers}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+      />
 
     </div>
   );
