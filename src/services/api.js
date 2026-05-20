@@ -1,45 +1,31 @@
-const API_URL = "http://127.0.0.1:5000/users";
+import axios from "axios";
+
+const BASE_URL = "http://127.0.0.1:5000";
 
 
 export const getUsers = async () => {
 
-  const response = await fetch(API_URL);
+  return axios.get(`${BASE_URL}/users`);
 
-  return response.json();
 };
 
 
 export const addUser = async (userData) => {
 
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userData),
-  });
+  return axios.post(`${BASE_URL}/users`, userData);
 
-  return response.json();
 };
 
 
 export const updateUser = async (id, userData) => {
 
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userData),
-  });
+  return axios.put(`${BASE_URL}/users/${id}`, userData);
 
-  return response.json();
 };
 
 
 export const deleteUser = async (id) => {
 
-  await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
+  return axios.delete(`${BASE_URL}/users/${id}`);
+
 };

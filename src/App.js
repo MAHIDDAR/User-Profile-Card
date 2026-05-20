@@ -36,21 +36,21 @@ function App() {
 
   const fetchUsers = async () => {
 
-    try {
+  try {
 
-      const data = await getUsers();
+    const response = await getUsers();
 
-      setUsers(data);
+    setUsers(response.data);
 
-      setLoading(false);
+    setLoading(false);
 
-    } catch (error) {
+  } catch (error) {
 
-      setError("Failed to fetch users");
+    setError("Failed to fetch users");
 
-      setLoading(false);
-    }
-  };
+    setLoading(false);
+  }
+};
 
 
   const handleAddUser = async (userData) => {

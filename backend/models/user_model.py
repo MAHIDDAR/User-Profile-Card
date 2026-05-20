@@ -1,87 +1,148 @@
-import requests
-
-
-API_URL = "https://jsonplaceholder.typicode.com/users"
-
-
-local_users = []
+from backend.database.db import get_db_connection
 
 
 def get_all_users():
 
-    response = requests.get(API_URL)
+    connection = get_db_connection()
 
-    api_users = response.json()
+    users = connection.execute(
 
+        "SELECT * FROM users"
 
-    formatted_users = []
+    ).fetchall()
 
-    for user in api_users:
+    connection.close()
 
-        formatted_users.append({
-
-            "id": user["id"],
-
-            "name": user["name"],
-
-            "email": user["email"],
-
-            "role": "Developer",
-
-            "bio": f"{user['name']} is working on modern web technologies.",
-
-            "company": user["company"]["name"],
-
-            "website": user["website"]
-        })
-
-
-    formatted_users.extend(local_users)
-
-    return formatted_users
+    return [dict(user) for user in users]
 
 
 def get_user_by_id(user_id):
 
-    users = get_all_users()
+    connection = get_db_connection()
 
-    for user in users:
+    user = connection.execute(
 
-        if user["id"] == user_id:
+        "SELECT * FROM users WHERE id = ?",
 
-            return user
+        (user_id,)
+
+    ).fetchone()
+
+    connection.close()
+
+    if user:
+
+        return dict(user)
 
     return None
 
 
-def add_user(new_user):
+def add_user(user_data):
 
-    local_users.append(new_user)
+    connection = get_db_connection()
 
-    return new_user
+    cursor = connection.cursor()
+
+
+    cursor.execute("""
+
+        INSERT INTO users
+
+        (name, email, role, bio, company, website)
+
+        VALUES (?, ?, ?, ?, ?, ?)
+
+    """, (
+
+        user_data["name"],
+
+        user_data["email"],
+
+        user_data["role"],
+
+        user_data["bio"],
+
+        user_data["company"],
+
+        user_data["website"]
+
+    ))
+
+
+    connection.commit()
+
+    new_user_id = cursor.lastrowid
+
+    connection.close()
+
+    return get_user_by_id(new_user_id)
 
 
 def update_user(user_id, updated_data):
 
-    for user in local_users:
+    connection = get_db_connection()
 
-        if user["id"] == user_id:
 
-            user.update(updated_data)
+    connection.execute("""
 
-            return user
+        UPDATE users
 
-    return None
+        SET
+
+            name = ?,
+
+            email = ?,
+
+            role = ?,
+
+            bio = ?,
+
+            company = ?,
+
+            website = ?
+
+        WHERE id = ?
+
+    """, (
+
+        updated_data["name"],
+
+        updated_data["email"],
+
+        updated_data["role"],
+
+        updated_data["bio"],
+
+        updated_data["company"],
+
+        updated_data["website"],
+
+        user_id
+
+    ))
+
+
+    connection.commit()
+
+    connection.close()
+
+    return get_user_by_id(user_id)
 
 
 def delete_user(user_id):
 
-    for user in local_users:
+    connection = get_db_connection()
 
-        if user["id"] == user_id:
+    connection.execute(
 
-            local_users.remove(user)
+        "DELETE FROM users WHERE id = ?",
 
-            return True
+        (user_id,)
 
-    return False
+    )
+
+    connection.commit()
+
+    connection.close()
+
+    return True

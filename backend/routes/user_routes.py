@@ -1,89 +1,117 @@
 from flask import Blueprint, jsonify, request
 
 from backend.models.user_model import (
+
     get_all_users,
     get_user_by_id,
     add_user,
     update_user,
     delete_user
+
 )
 
-from backend.utils.helpers import validate_user_data
+
+user_routes = Blueprint("user_routes", __name__)
 
 
-user_routes = Blueprint('user_routes', __name__)
-
-
-@user_routes.route('/users', methods=['GET'])
+@user_routes.route("/users", methods=["GET"])
 def fetch_users():
 
-    return jsonify(get_all_users())
+    users = get_all_users()
+
+    return jsonify(users), 200
 
 
-@user_routes.route('/users/<int:user_id>', methods=['GET'])
+@user_routes.route("/users/<int:user_id>", methods=["GET"])
 def fetch_single_user(user_id):
 
     user = get_user_by_id(user_id)
 
-    if user:
-        return jsonify(user)
-
-    return jsonify({
-        "error": "User not found"
-    }), 404
-
-
-@user_routes.route('/users', methods=['POST'])
-def create_user():
-
-    data = request.get_json()
-
-    if not validate_user_data(data):
+    if not user:
 
         return jsonify({
-            "error": "Invalid user data"
-        }), 400
 
-    new_user = {
-        "id": len(get_all_users()) + 1,
-        "name": data["name"],
-        "email": data["email"],
-        "role": data["role"],
-        "bio": data["bio"],
-        "company": data["company"],
-        "website": data["website"]
-    }
+            "error": "User not found"
 
-    add_user(new_user)
+        }), 404
+
+    return jsonify(user), 200
+
+
+@user_routes.route("/users", methods=["POST"])
+def create_user():
+
+    data = request.json
+
+
+    required_fields = [
+
+        "name",
+        "email",
+        "role",
+        "bio",
+        "company",
+        "website"
+
+    ]
+
+
+    for field in required_fields:
+
+        if field not in data or not data[field]:
+
+            return jsonify({
+
+                "error": f"{field} is required"
+
+            }), 400
+
+
+    new_user = add_user(data)
 
     return jsonify(new_user), 201
 
 
-@user_routes.route('/users/<int:user_id>', methods=['PUT'])
+@user_routes.route("/users/<int:user_id>", methods=["PUT"])
 def edit_user(user_id):
 
-    data = request.get_json()
+    data = request.json
+
+
+    existing_user = get_user_by_id(user_id)
+
+    if not existing_user:
+
+        return jsonify({
+
+            "error": "User not found"
+
+        }), 404
+
 
     updated_user = update_user(user_id, data)
 
-    if updated_user:
-        return jsonify(updated_user)
-
-    return jsonify({
-        "error": "User not found"
-    }), 404
+    return jsonify(updated_user), 200
 
 
-@user_routes.route('/users/<int:user_id>', methods=['DELETE'])
+@user_routes.route("/users/<int:user_id>", methods=["DELETE"])
 def remove_user(user_id):
 
-    deleted = delete_user(user_id)
+    existing_user = get_user_by_id(user_id)
 
-    if deleted:
+    if not existing_user:
+
         return jsonify({
-            "message": "User deleted successfully"
-        })
+
+            "error": "User not found"
+
+        }), 404
+
+
+    delete_user(user_id)
 
     return jsonify({
-        "error": "User not found"
-    }), 404
+
+        "message": "User deleted successfully"
+
+    }), 200
